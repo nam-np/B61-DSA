@@ -22,6 +22,7 @@ public class Maze {
 		    	  i0 = Integer.parseInt(line[2]);
 		    	  j0 = Integer.parseInt(line[3]);
 		    	  data = new int[M+1][N+1];
+		    	  save = new int[M+1][N+1];
 		    	  line_num = 0;
 		    	 }else {
 		            for (int j=0; j<line.length; j++) {
@@ -41,30 +42,49 @@ public class Maze {
 	
 	int step = 0;
 	int max = Integer.MAX_VALUE;
+	boolean check = false;
+	int save[][];
+	int cnt = 0;
+	String[] list = new String[1000];
+	String namnp="";
 	
 	boolean solve(int x, int y) {
-		if((x == 1 || y == 1 || x == M || y == N) && data[x][y]==0) {
-			if (max > step){
-				max = step;
+				
+		if(isValid(x, y)) {
+			if((x == 1 || y == 1 || x == M || y == N)) {				
+				if (max > step){
+					save[x][y]=1;
+					list[cnt]= namnp+x+","+y +"  ";
+					cnt ++;
+					max = step;	
+					}				
+				check = true;
+				return false;
 			}
-			return false;
+			data[x][y]=2;
+			namnp = namnp+x+","+y +"  ";
+			
+			step++;
+			
+			if(solve(x+1, y)) return true;
+			if(solve(x, y+1)) return true;
+			if(solve(x-1, y)) return true;
+			if(solve(x, y-1)) return true;
+			
+			data[x][y]=0;
+			String tmp=x+","+y +"  ";
+			namnp = namnp.replace(tmp, "");
+			step--;
 		}
-		
-		if (data[x][y] == 1 || data[x][y] == 2 ){
-			return false;
-		}
-		
-		
-		data[x][y]=2;
-		step++;
-		
-		if(solve(x+1, y)) return true;
-		if(solve(x, y+1)) return true;
-		if(solve(x-1, y)) return true;
-		if(solve(x, y-1)) return true;
-		data[x][y] = 0;
-		step--;
 		return false;
+	}
+	
+	void printMaze(int m, int n) {
+		for (int i=1; i<=m; i++) {
+			for(int j=1; j<=n; j++) {
+				
+			}	
+		}
 	}
 	
 	public static void main(String[] args) throws FileNotFoundException {
@@ -77,8 +97,24 @@ public class Maze {
 				System.out.print(maze.data[i][j] +" ");
 			System.out.println();
 		}
-		maze.solve(4, 3);
-		System.out.println(maze.max);
+		System.out.println("=======================");
+		if(maze.isValid(maze.i0, maze.j0)) {
+			if(!maze.solve(maze.i0, maze.j0) && maze.check == true) {
+				System.out.println("Min steps to escape the Mazer is: " +(maze.max+1));
+				String result = null;
+				int max = Integer.MAX_VALUE;
+				for(int i=0; i<maze.cnt;i++) {
+					if(maze.list[i].length() < max) {
+						max=maze.list[i].length();
+					    result=maze.list[i];
+					}			
+				}
+				System.out.println(result);
+			}
+			else System.out.println("No path to escape the Mazer");
+		}else System.out.println("Point is invalid");
+		
+		
 	}
 
 }
